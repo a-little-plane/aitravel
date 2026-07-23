@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}分组执行界面（占位）{% endblock %}
+{% block content %}
+<h1 class="page-title">执行界面（占位）</h1>
+<p style="text-align:center; color:#666; margin: 30px 0;">{{ message }}</p>
+<p style="text-align:center; color:#888; font-size:13px; margin-top: 20px;">
+    提示：当前分组为未知分组。请联系实验管理员。
+</p>
+<div style="text-align:center; margin-top:30px;">
+    <form method="post" action="{{ url_for('task.submit_task') }}" style="display:inline;">
+        <input type="hidden" name="doc_content" value="(占位)">
+        <button class="btn" type="submit">提交任务结果</button>
+    </form>
+    <a class="btn btn-outline" href="{{ url_for('auth.logout') }}" style="margin-left:10px;">退出登录</a>
+</div>
+{% endblock %}

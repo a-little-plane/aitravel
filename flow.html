@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>实验流程图 — 三组完整版</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f7f8fa;
+    padding: 40px 20px;
+    color: #2c3e50;
+  }
+  h1 { text-align: center; margin-bottom: 10px; color: #1a1a1a; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 40px; font-size: 14px; }
+  .flow-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 50px 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .row { display: flex; align-items: center; justify-content: center; margin-bottom: 50px; flex-wrap: wrap; gap: 20px; }
+  .row.last { margin-bottom: 0; }
+  .node {
+    background: #fff;
+    border: 2px solid #5b9bd5;
+    border-radius: 6px;
+    padding: 18px 26px;
+    min-width: 140px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(91,155,213,0.15);
+  }
+  .node.start { border-color: #70ad47; color: #2e7d32; }
+  .node.demo { border-color: #5b9bd5; color: #1976d2; }
+  .node.task { border-color: #ed7d31; color: #d84315; }
+  .node.survey { border-color: #7030a0; color: #6a1b9a; }
+  .arrow { display: flex; align-items: center; color: #666; font-size: 13px; }
+  .arrow .line { width: 60px; height: 2px; background: #888; position: relative; }
+  .arrow .line::after {
+    content: ""; position: absolute; right: -2px; top: -5px;
+    width: 0; height: 0;
+    border-left: 8px solid #888;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+  .arrow .label {
+    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    background: #fff; padding: 0 6px; white-space: nowrap; font-size: 12px; color: #555;
+  }
+  .branch-area { display: flex; gap: 40px; align-items: stretch; }
+  .branch { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .branch .ai-tag {
+    display: flex; gap: 6px; align-items: center;
+    font-size: 12px; color: #666; background: #f8f9fa; padding: 6px 12px; border-radius: 4px;
+  }
+  .ai-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+  .ai-dot.red { background: #d63031; }
+  .ai-dot.yellow { background: #fdcb6e; }
+  .legend {
+    max-width: 1280px; margin: 30px auto 0;
+    background: #fff; padding: 20px 30px;
+    border-radius: 8px; border-left: 4px solid #5b9bd5;
+    font-size: 13px; line-height: 1.8; color: #555;
+  }
+  .legend strong { color: #1a1a1a; }
+  .legend code { background: #f1f3f5; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; color: #c7254e; }
+  .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 6px; font-weight: normal; }
+</style>
+</head>
+<body>
+
+<h1>实验流程图（三组完整版）</h1>
+<p class="subtitle">注册 → 演示 → 三组并行（H / H_SOA / H_MOA）→ 问卷</p>
+
+<div class="flow-container">
+
+  <div class="row">
+    <div class="node start">注册页面</div>
+    <div class="arrow"><div class="line"><span class="label">输入信息后点击"确认"按钮</span></div></div>
+    <div class="node demo">演示页面</div>
+  </div>
+
+  <div class="row">
+    <div class="branch-area">
+      <div class="branch">
+        <div class="arrow"><div class="line"><span class="label">点击"我已理解任务要求"</span></div></div>
+        <div class="node task">操作页面 H</div>
+        <div class="ai-tag">仅搜索引擎 + 编辑器</div>
+      </div>
+      <div class="branch">
+        <div class="arrow"><div class="line"><span class="label">点击"我已理解任务要求"</span></div></div>
+        <div class="node task">操作页面 H_SOA</div>
+        <div class="ai-tag"><span class="ai-dot red"></span> 1 个 AI 助理</div>
+      </div>
+      <div class="branch">
+        <div class="arrow"><div class="line"><span class="label">点击"我已理解任务要求"</span></div></div>
+        <div class="node task">操作页面 H_MOA</div>
+        <div class="ai-tag">
+          <span class="ai-dot red"></span>
+          <span class="ai-dot yellow"></span>
+          <span class="ai-dot yellow"></span>
+          3 个 AI（A/B/C）
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row last">
+    <div class="branch-area">
+      <div class="branch">
+        <div class="node task">操作页面 H</div>
+        <div class="arrow"><div class="line"><span class="label">点击"提交任务结果"</span></div></div>
+      </div>
+      <div class="branch">
+        <div class="node task">操作页面 H_SOA</div>
+        <div class="arrow"><div class="line"><span class="label">点击"提交任务结果"</span></div></div>
+      </div>
+      <div class="branch">
+        <div class="node task">操作页面 H_MOA</div>
+        <div class="arrow"><div class="line"><span class="label">点击"提交任务结果"</span></div></div>
+      </div>
+    </div>
+    <div class="arrow"><div class="line"></div></div>
+    <div class="node survey">问卷</div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <p><strong>三组说明：</strong></p>
+  <p>1. <strong>H 组（人类单独）</strong>：左侧只有搜索引擎（真实 DuckDuckGo + Bing 兜底），右侧富文本编辑器，无 AI 辅助 <span class="badge">已实现</span></p>
+  <p>2. <strong>H_SOA 组（单 Oracle Agent）</strong>：左侧 1 个红色 AI 助理 + 搜索引擎可切换，AI 回复默认 mock 模式 <span class="badge">已实现</span></p>
+  <p>3. <strong>H_MOA 组（多 Oracle Agents）</strong>：左侧 3 个 AI（A 红/B 黄/C 黄），支持 <code>@A</code> <code>@B</code> <code>@C</code> 多 AI 同时回复 <span class="badge">已实现</span></p>
+  <p style="margin-top: 10px;"><strong>AI 配置：</strong>在 <code>ai_config.json</code> 中修改 <code>provider</code> 字段即可切换 AI：</p>
+  <p>　· <code>mock</code>（默认）：本地模拟回复，无需任何 key</p>
+  <p>　· <code>zhipu</code>：智谱 GLM-4-Flash（免费层 1qps，中文强）</p>
+  <p>　· <code>dashscope</code>：阿里通义千问 OpenAI 兼容模式</p>
+  <p>　· <code>deepseek</code>：DeepSeek（注册送额度）</p>
+  <p>　· <code>kimi</code>：月之暗面 Kimi</p>
+  <p>　· <code>ollama</code>：本地 Ollama（完全免费，需先 ollama serve）</p>
+  <p>　· <code>openai</code>：OpenAI 官方</p>
+  <p style="margin-top: 6px; color: #999;">修改 ai_config.json 后无需重启服务，下一次请求自动生效（按 mtime 缓存）。</p>
+</div>
+
+</body>
+</html>

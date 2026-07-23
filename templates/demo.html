@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}任务演示{% endblock %}
+{% block content %}
+<h1 class="page-title">演示界面</h1>
+
+<video class="demo-video" controls preload="metadata" src="{{ video_url }}">
+    您的浏览器不支持 HTML5 视频播放。
+</video>
+
+<form class="demo-confirm" method="post" action="{{ url_for('demo.confirm_understood') }}">
+    <button type="submit" class="btn">我已理解任务要求</button>
+</form>
+
+<p style="text-align:center; color:#888; font-size:12px; margin-top:20px;">
+    任务说明：{{ instruction }}
+</p>
+{% endblock %}

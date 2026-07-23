@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}实验完成{% endblock %}
+{% block content %}
+<div class="thanks-box">
+    <h2>感谢您参与本次实验！</h2>
+    <p>您的回答已成功提交，实验数据将由研究人员统一处理。</p>
+    <p style="margin-top:20px;">
+        <a class="btn" href="{{ url_for('auth.logout') }}">退出登录</a>
+    </p>
+</div>
+{% endblock %}

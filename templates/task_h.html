@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% block title %}任务执行{% endblock %}
+{% block head_extra %}
+<style>
+    body { background: #f7f8fa; }
+    .page { padding: 20px; }
+
+    /* ===== 搜索结果中的链接 ===== */
+    .search-results .item-title a {
+        color: #1a0dab;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .search-results .item-title a:hover { text-decoration: underline; }
+    .search-results .item-snippet {
+        color: #555;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+    .search-results .item-url {
+        color: #008000;
+        font-size: 12px;
+        margin-top: 2px;
+        word-break: break-all;
+    }
+    .search-loading {
+        text-align: center;
+        padding: 20px;
+        color: #999;
+        font-size: 13px;
+    }
+
+    /* ===== 富文本编辑器 ===== */
+    .editor-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 6px 8px;
+        border-bottom: 1px solid #e0e4ec;
+        background: #f9f9fb;
+        border-radius: 3px 3px 0 0;
+    }
+    .editor-toolbar .tb-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 28px;
+        border: 1px solid #d0d4dc;
+        background: #fff;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #444;
+        transition: all .15s;
+        user-select: none;
+    }
+    .editor-toolbar .tb-btn:hover {
+        background: #e8f0fe;
+        border-color: #2f7cf6;
+    }
+    .editor-toolbar .tb-btn:active {
+        background: #d0e0fc;
+    }
+    .editor-toolbar .tb-sep {
+        width: 1px;
+        height: 20px;
+        background: #d0d4dc;
+        margin: 4px 2px;
+    }
+    .editor-toolbar .tb-save {
+        width: auto;
+        padding: 0 12px;
+        background: #28a745;
+        color: #fff;
+        border-color: #28a745;
+        font-weight: 500;
+        margin-left: auto;
+    }
+    .editor-toolbar .tb-save:hover {
+        background: #218838;
+        border-color: #218838;
+    }
+    .doc-editor {
+        flex: 1;
+        min-height: 340px;
+        padding: 14px 16px;
+        border: 1px solid #d0d4dc;
+        border-top: none;
+        border-radius: 0 0 3px 3px;
+        font-size: 14px;
+        line-height: 1.8;
+        outline: none;
+        overflow-y: auto;
+        background: #fff;
+    }
+    .doc-editor:focus { border-color: #2f7cf6; }
+    .doc-editor:empty::before {
+        content: attr(data-placeholder);
+        color: #b6bcc8;
+        pointer-events: none;
+    }
+    .doc-editor h1, .doc-editor h2, .doc-editor h3 {
+        margin: 10px 0 6px;
+    }
+    .doc-editor ul, .doc-editor ol {
+        margin: 6px 0 6px 24px;
+    }
+    .doc-editor table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 8px 0;
+    }
+    .doc-editor td, .doc-editor th {
+        border: 1px solid #ccc;
+        padding: 6px 10px;
+    }
+
+    .save-tip {
+        font-size: 12px;
+        color: #28a745;
+        margin-left: 8px;
+        opacity: 0;
+        transition: opacity .3s;
+    }
+    .save-tip.show { opacity: 1; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="task-shell">
+    <!-- 顶部任务栏 -->
+    <div class="task-topbar">
+        <div class="timer" id="timer" title="任务已用时间">00:00</div>
+        <div class="instruction">{{ instruction }}</div>
+        <form method="post" action="{{ url_for('task.submit_task') }}" id="submitForm" style="display:inline;">
+            <input type="hidden" name="doc_content" id="docContentInput">
+            <button type="button" class="submit-btn" onclick="submitResult()">"提交任务结果"按钮</button>
+        </form>
+    </div>
+
+    <!-- 主体：左搜索 / 右文档 -->
+    <div class="task-body">
+        <div class="task-pane left">
+            <div class="search-pane">
+                <h3>搜索引擎</h3>
+                <div class="search-input-row">
+                    <input type="text" id="searchInput" placeholder="搜索关键词" 
+                           onkeydown="if(event.key==='Enter'){doSearch();}">
+                    <button class="btn" type="button" onclick="doSearch()">搜索</button>
+                </div>
+                <div class="search-results" id="searchResults">
+                    <p style="color:#999; font-size:13px;">在上方输入关键词以检索信息</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-pane right">
+            <div class="editor-pane">
+                <h3>内置的文本编辑器</h3>
+
+                <!-- 工具栏 -->
+                <div class="editor-toolbar">
+                    <button class="tb-btn" type="button" title="加粗" onclick="execCmd('bold')"><b>B</b></button>
+                    <button class="tb-btn" type="button" title="斜体" onclick="execCmd('italic')"><i>I</i></button>
+                    <button class="tb-btn" type="button" title="下划线" onclick="execCmd('underline')"><u>U</u></button>
+                    <div class="tb-sep"></div>
+                    <button class="tb-btn" type="button" title="一级标题" onclick="execCmd('formatBlock','<h2>')">H1</button>
+                    <button class="tb-btn" type="button" title="二级标题" onclick="execCmd('formatBlock','<h3>')">H2</button>
+                    <button class="tb-btn" type="button" title="正文" onclick="execCmd('formatBlock','<p>')">P</button>
+                    <div class="tb-sep"></div>
+                    <button class="tb-btn" type="button" title="无序列表" onclick="execCmd('insertUnorderedList')">&#8226;</button>
+                    <button class="tb-btn" type="button" title="有序列表" onclick="execCmd('insertOrderedList')">1.</button>
+                    <div class="tb-sep"></div>
+                    <button class="tb-btn" type="button" title="插入表格" onclick="insertTable()">▦</button>
+                    <button class="tb-btn" type="button" title="清除格式" onclick="execCmd('removeFormat')">&#x2715;</button>
+                    <!-- 保存按钮 -->
+                    <button class="tb-btn tb-save" type="button" title="保存文档到本地" onclick="saveToLocal()">
+                        保存到本地
+                    </button>
+                </div>
+                <span class="save-tip" id="saveTip">已保存</span>
+
+                <!-- 可编辑区域 -->
+                <div class="doc-editor" id="docEditor" contenteditable="true" 
+                     data-placeholder="请在此处整理您的行程规划内容…" oninput="onEditorInput()"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // 计时器
+    // ============================================================
+    (function () {
+        const enterTime = new Date("{{ task.enter_time }}".replace(' ', 'T'));
+        const el = document.getElementById('timer');
+        function tick() {
+            const diff = Math.floor((Date.now() - enterTime.getTime()) / 1000);
+            const mm = String(Math.floor(diff / 60)).padStart(2, '0');
+            const ss = String(diff % 60).padStart(2, '0');
+            el.textContent = mm + ':' + ss;
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
+
+    // ============================================================
+    // 富文本编辑器
+    // ============================================================
+    function execCmd(cmd, val) {
+        document.execCommand(cmd, false, val || null);
+        document.getElementById('docEditor').focus();
+    }
+
+    function insertTable() {
+        const rows = prompt('行数:', '3');
+        if (!rows) return;
+        const cols = prompt('列数:', '3');
+        if (!cols) return;
+        let html = '<table><tbody>';
+        for (let i = 0; i < parseInt(rows); i++) {
+            html += '<tr>';
+            for (let j = 0; j < parseInt(cols); j++) {
+                html += '<td>&nbsp;</td>';
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        execCmd('insertHTML', html);
+    }
+
+    function onEditorInput() {
+        // 可在此处做自动保存等逻辑
+    }
+
+    // ============================================================
+    // 真实百度搜索
+    // ============================================================
+    function doSearch() {
+        const kw = document.getElementById('searchInput').value.trim();
+        if (!kw) return;
+        const box = document.getElementById('searchResults');
+        box.innerHTML = '<div class="search-loading">正在搜索「' + kw + '」…</div>';
+
+        fetch('{{ url_for("task.search") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'keyword=' + encodeURIComponent(kw)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok && data.results && data.results.length) {
+                box.innerHTML = data.results.map(r => {
+                    const title = r.url
+                        ? `<a href="${r.url}" target="_blank" rel="noopener">${r.title}</a>`
+                        : `<span>${r.title}</span>`;
+                    const urlLine = r.url
+                        ? `<div class="item-url">${r.url}</div>`
+                        : '';
+                    return `<div class="item">
+                        <div class="item-title">${title}</div>
+                        ${urlLine}
+                        <div class="item-snippet">${r.snippet}</div>
+                     </div>`;
+                }).join('');
+            } else {
+                box.innerHTML = '<p style="color:#999; font-size:13px;">没有找到相关结果</p>';
+            }
+        })
+        .catch(() => {
+            box.innerHTML = '<p style="color:#c00; font-size:13px;">搜索请求失败，请稍后重试</p>';
+        });
+    }
+
+    // ============================================================
+    // 保存文档到本地（浏览器下载 + 服务器存档）
+    // ============================================================
+    function saveToLocal() {
+        const editor = document.getElementById('docEditor');
+        const content = editor.innerHTML.trim();
+        if (!content || content === '<br>' || content === '<div><br></div>') {
+            alert('编辑器内容为空，请先输入内容再保存。');
+            return;
+        }
+
+        // 1. 浏览器端下载 HTML 文件到用户电脑
+        const fullHtml = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n'
+            + '<title>行程规划</title>\n<style>'
+            + 'body{font-family:"Microsoft YaHei",sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.8;}'
+            + 'table{border-collapse:collapse;width:100%;}td,th{border:1px solid #ccc;padding:8px;}'
+            + '</style>\n</head>\n<body>\n' + content + '\n</body>\n</html>';
+        const blob = new Blob([fullHtml], {type: 'text/html;charset=utf-8'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const now = new Date();
+        const ts = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0')
+                 + String(now.getDate()).padStart(2,'0') + '_'
+                 + String(now.getHours()).padStart(2,'0')
+                 + String(now.getMinutes()).padStart(2,'0');
+        a.download = '行程规划_' + ts + '.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+
+        // 2. 同时保存一份到服务器（实验数据收集）
+        fetch('{{ url_for("task.save_doc") }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'doc_content=' + encodeURIComponent(content) + '&format=html'
+        })
+        .then(r => r.json())
+        .then(data => {
+            const tip = document.getElementById('saveTip');
+            tip.classList.add('show');
+            setTimeout(() => tip.classList.remove('show'), 2000);
+        })
+        .catch(() => {});
+    }
+
+    // ============================================================
+    // 提交任务结果
+    // ============================================================
+    function submitResult() {
+        const editor = document.getElementById('docEditor');
+        const content = editor.innerHTML.trim();
+        if (!content || content === '<br>' || content === '<div><br></div>') {
+            alert('编辑器内容为空，请先输入行程规划内容。');
+            return;
+        }
+        if (!confirm('确认要提交任务结果吗？提交后将进入问卷环节。')) return;
+        document.getElementById('docContentInput').value = content;
+        document.getElementById('submitForm').submit();
+    }
+</script>
+{% endblock %}

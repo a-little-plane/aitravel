@@ -1,0 +1,70 @@
+{
+  "_comment": "AI 服务配置文件。当前 provider 决定使用哪个 AI 后端。修改后无需重启服务，下次请求自动生效。",
+  "_usage": [
+    "1. provider: 'mock' - 模拟模式（默认），不调用任何外部 API",
+    "2. provider: 'zhipu' - 智谱 GLM-4-Flash，OpenAI 兼容，免费层 1qps",
+    "3. provider: 'dashscope' - 阿里云通义千问 OpenAI 兼容模式",
+    "4. provider: 'deepseek' - DeepSeek，注册送额度",
+    "5. provider: 'kimi' - 月之暗面 Kimi，OpenAI 兼容",
+    "6. provider: 'ollama' - 本地 Ollama，需先 ollama serve 运行"
+  ],
+
+  "provider": "mock",
+
+  "providers": {
+    "mock": {
+      "type": "mock",
+      "description": "本地模拟 AI，不调用任何外部 API（用于演示与行为基线）"
+    },
+    "zhipu": {
+      "type": "openai_compatible",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "api_key": "",
+      "model": "glm-4-flash",
+      "description": "智谱 GLM-4-Flash：免费层 1qps，中文能力强，注册即用 (https://bigmodel.cn)"
+    },
+    "dashscope": {
+      "type": "openai_compatible",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "api_key": "",
+      "model": "qwen-turbo",
+      "description": "阿里云通义千问 OpenAI 兼容模式，新用户有免费额度 (https://dashscope.aliyun.com)"
+    },
+    "deepseek": {
+      "type": "openai_compatible",
+      "base_url": "https://api.deepseek.com/v1",
+      "api_key": "",
+      "model": "deepseek-chat",
+      "description": "DeepSeek，注册送额度，OpenAI 兼容 (https://platform.deepseek.com)"
+    },
+    "kimi": {
+      "type": "openai_compatible",
+      "base_url": "https://api.moonshot.cn/v1",
+      "api_key": "",
+      "model": "moonshot-v1-8k",
+      "description": "月之暗面 Kimi，OpenAI 兼容 (https://platform.moonshot.cn)"
+    },
+    "openai": {
+      "type": "openai_compatible",
+      "base_url": "https://api.openai.com/v1",
+      "api_key": "",
+      "model": "gpt-4o-mini",
+      "description": "OpenAI 官方 API (https://platform.openai.com)"
+    },
+    "ollama": {
+      "type": "openai_compatible",
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "ollama",
+      "model": "qwen2.5:7b",
+      "description": "本地 Ollama（需先 ollama serve 运行并下载模型：ollama pull qwen2.5:7b）"
+    }
+  },
+
+  "agent_prompts": {
+    "_comment": "H_SOA 单一 AI 的系统提示；H_MOA 三个 AI 各有差异化角色，模拟'多专家会诊'",
+    "default": "你是一个贴心的旅行规划助手。请基于用户的需求给出简洁、实用的建议。",
+    "A": "你是一位资深行程规划专家，擅长把控全局节奏与时间安排，回答请突出'日程-时间-地点-花费'四要素。",
+    "B": "你是一位本地美食与文化向导，擅长推荐当地特色餐厅、小众景点与人文故事，回答请突出'体验-故事-花费'。",
+    "C": "你是一位预算与交通规划专家，擅长交通路线优化与省钱技巧，回答请突出'交通-票价-时间-省钱建议'。"
+  }
+}

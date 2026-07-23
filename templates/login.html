@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}登录{% endblock %}
+{% block content %}
+<h1 class="page-title">登录界面</h1>
+
+<form class="login-form" method="post" action="{{ url_for('auth.login_post') }}">
+    <div class="form-item">
+        <label for="phone">请输入手机号</label>
+        <input type="tel" id="phone" name="phone" placeholder="请输入" maxlength="11"
+               value="{{ phone or '' }}" autocomplete="off" autofocus>
+    </div>
+    <div class="login-actions">
+        <a href="{{ url_for('auth.register_page') }}" class="btn btn-outline">注册</a>
+        <button type="submit" class="btn">登录</button>
+    </div>
+</form>
+{% endblock %}

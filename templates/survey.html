@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}任务后问卷{% endblock %}
+{% block content %}
+<h1 class="page-title">问卷</h1>
+
+<form method="post" action="{{ url_for('survey.submit_survey') }}">
+    <div class="survey-inputs">
+        <input type="text" name="q1" placeholder="请输入" required>
+        <input type="text" name="q2" placeholder="请输入" required>
+    </div>
+    <div class="survey-submit">
+        <button type="submit" class="btn">提交问卷</button>
+    </div>
+</form>
+{% endblock %}

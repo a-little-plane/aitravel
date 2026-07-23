@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}注册{% endblock %}
+{% block content %}
+<h1 class="page-title">注册界面</h1>
+
+<form class="register-form" method="post" action="{{ url_for('auth.register_post') }}">
+    <div class="form-row">
+        <label for="phone">手机号</label>
+        <input type="tel" id="phone" name="phone" maxlength="11"
+               value="{{ phone or '' }}" autocomplete="off" required>
+    </div>
+
+    <div class="form-row">
+        <label for="nickname">昵称</label>
+        <input type="text" id="nickname" name="nickname"
+               value="{{ nickname or '' }}" required>
+    </div>
+
+    <div class="form-row">
+        <label for="age">年龄</label>
+        <input type="number" id="age" name="age" min="10" max="100"
+               value="{{ age or '' }}" required>
+    </div>
+
+    <div class="form-row">
+        <label for="gender">性别</label>
+        <select id="gender" name="gender" required>
+            <option value="">请选择</option>
+            <option value="男"  {% if gender == '男'  %}selected{% endif %}>男</option>
+            <option value="女"  {% if gender == '女'  %}selected{% endif %}>女</option>
+        </select>
+    </div>
+
+    <div class="form-row radio-row">
+        <label>受教育程度</label>
+        <div class="radio-group">
+            <label><input type="radio" name="education" value="本科" {% if education == '本科' or not education %}checked{% endif %}> 本科</label>
+            <label><input type="radio" name="education" value="大专" {% if education == '大专' %}checked{% endif %}> 大专</label>
+            <label><input type="radio" name="education" value="硕士" {% if education == '硕士' %}checked{% endif %}> 硕士</label>
+            <label><input type="radio" name="education" value="博士" {% if education == '博士' %}checked{% endif %}> 博士</label>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <label for="computer_freq">计算机使用频率</label>
+        <select id="computer_freq" name="computer_freq">
+            <option value="">请选择</option>
+            <option value="每天"     {% if computer_freq == '每天' %}selected{% endif %}>每天</option>
+            <option value="每周数次" {% if computer_freq == '每周数次' %}selected{% endif %}>每周数次</option>
+            <option value="偶尔"     {% if computer_freq == '偶尔' %}selected{% endif %}>偶尔</option>
+            <option value="很少"     {% if computer_freq == '很少' %}selected{% endif %}>很少</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="ai_experience">AI 工具使用经验</label>
+        <select id="ai_experience" name="ai_experience">
+            <option value="">请选择</option>
+            <option value="经常使用" {% if ai_experience == '经常使用' %}selected{% endif %}>经常使用</option>
+            <option value="偶尔使用" {% if ai_experience == '偶尔使用' %}selected{% endif %}>偶尔使用</option>
+            <option value="仅听说过" {% if ai_experience == '仅听说过' %}selected{% endif %}>仅听说过</option>
+            <option value="未使用过" {% if ai_experience == '未使用过' %}selected{% endif %}>未使用过</option>
+        </select>
+    </div>
+
+    <div class="register-submit">
+        <button type="submit" class="btn">确认</button>
+    </div>
+</form>
+{% endblock %}
